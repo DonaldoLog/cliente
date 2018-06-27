@@ -4,32 +4,40 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Cedula;
+use Illuminate\Support\Facades\Auth;
+
 
 class ConexionUipjController extends Controller
 {
-    public function resolviendo_peticion($idCarpeta = null)
+    public function resolviendo_peticion(Request $request)
     {
+        $idCarpeta=$request->idCarpeta;
+        $token=$request->token;
+
+        $user = Auth::user();
+        // dd($user);
         $existe = \App\Models\Cedula::where('idCarpeta', $idCarpeta)->get();
 
         if(count($existe)){
             $existe = $existe[0];
             return redirect()->action(
-                'CedulaController@show', ['id' => $existe->id]
+            
+                'CedulaController@show', ['id' => $existe->id,'token'=>$token]
             );
         }
 
         \DB::beginTransaction();
         try {
-        
+
             $carpeta = \DB::connection('mysql2')
                                 ->select('select c.id, u.nombres, u.apellidos, n.nombre as unidad, c.numCarpeta
                                             from carpeta c
-                                            left outer join control_carpeta t on c.id = t.idCarpeta 
+                                            left outer join control_carpeta t on c.id = t.idCarpeta
                                             left outer join users u on t.idFiscal = u.id
                                             left outer join unidad n on t.idUnidad = n.id
                                             where c.id ='.$idCarpeta);
-            
-            
+
+
             //dd($carpeta);
             $cedula = \App\Models\Cedula::create([
                 'entrevistadorNombres' 			=> $carpeta[0]->nombres,
@@ -38,16 +46,16 @@ class ConexionUipjController extends Controller
                 'entrevistadorCargo'			=> $carpeta[0]->unidad,
                 'carpeta'                       => $carpeta[0]->numCarpeta,
                 'idCarpeta'                     => $carpeta[0]->id,
-                'entrevistadorPrimeraVez'		=> 'SI',			
+                'entrevistadorPrimeraVez'		=> 'SI',
                 'idDialecto' 					=> '1'
-            ]);       
+            ]);
 
             /*$informante = \DB::connection('mysql2')
                         ->select('select s.nombres, s.primerAp, s.segundoAp, s.fechaNacimiento, s.rfc,
                         s.curp, s.idNacionalidad, s.sexo,
                         v.docIdentificacion, v.numDocIdentificacion, v.edad, v.idEstadoCivil,
                         d.calle, d.numExterno, d.numInterno, d.idMunicipio, d.idLocalidad, d.idColonia, d.idColonia as idCp,
-                        v.telefono                    
+                        v.telefono
                         from variables_persona v
                         left outer join extra_denunciante x on v.id = x.idVariablesPersona
                         left outer join persona s on v.idPersona = s.id
@@ -112,7 +120,7 @@ class ConexionUipjController extends Controller
                         ->where('carpeta.id', $idCarpeta)
                         ->get();
             //dd($informante);
-            
+
             $informante = $informante[0];
             //dd($informante->segundoAp);
             $persona = \App\Models\Persona::create([
@@ -126,8 +134,8 @@ class ConexionUipjController extends Controller
             ]);
 
             $idDocumentoIdentidad = \App\Models\CatDocumento::where('nombre',$informante->docIdentificacion)->get();
-            $idDocumentoIdentidad = (count($idDocumentoIdentidad)) ? $idDocumentoIdentidad[0]->id : 1 ;       
-  
+            $idDocumentoIdentidad = (count($idDocumentoIdentidad)) ? $idDocumentoIdentidad[0]->id : 1 ;
+
             $telefonos[] = array('tipoTelefono' => 'CELULAR',
                                     'lada' => '(+52)-',
                                     'telefono' => $informante->telefono,
@@ -137,7 +145,7 @@ class ConexionUipjController extends Controller
                 'idPersona'             => $persona->id,
                 'idCedula'              => $cedula->id,
                 'idParentesco'          => '1',
-                'idDocumentoIdentidad'  => $idDocumentoIdentidad, 
+                'idDocumentoIdentidad'  => $idDocumentoIdentidad,
                 'otroDocIdentidad'      => null,
                 'numDocIdentidad'       => $informante->numDocIdentificacion,
                 'correoElectronico'     => null,
@@ -146,7 +154,7 @@ class ConexionUipjController extends Controller
                 'notificaciones'        => 1,
                 'tipoPersona'           => 'INFORMANTE',
             ]);
-            
+
             $domicilio = \App\Models\Domicilio::create([
                 'idDesaparecido'    => $desaparecido->id,
                 'tipoDireccion'     => 'PERSONAL',
@@ -159,7 +167,7 @@ class ConexionUipjController extends Controller
                 'idColonia'         => $informante->idColoniaPersonal,
                 'idCodigoPostal'    => $informante->idColoniaPersonal,
             ]);
-        
+
         	\DB::commit();
 	        $data['success'] = true;
         } catch (\Exception $e) {
@@ -170,7 +178,7 @@ class ConexionUipjController extends Controller
         }
         //dd($data);
         return redirect()->action(
-            'CedulaController@show', ['id' => $cedula->id]
+            'CedulaController@show', ['id' => $cedula->id,'token'=>$token]
         );
     }
 
@@ -183,7 +191,7 @@ class ConexionUipjController extends Controller
                 ->where('tipoPersona', 'DESAPARECIDA')
                 ->select('pe.nombres', 'pe.primerAp', 'pe.segundoAp', 'de.edadExtravio')
                 ->addSelect('de.apodo')
-                ->get();                                    
+                ->get();
 
         return response()->json($desaparecidos);
 

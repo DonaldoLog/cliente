@@ -11,15 +11,19 @@
 |
 */
 
-Route::get('/', 'InicioController@index');
+	Route::middleware(['jwt.auth'])->group(function(){
 
+
+Route::get('/', 'InicioController@index');
+// Route::get('cedula/{idCedula}', 'CedulaController@show');
 	Route::resource('cedula','CedulaController');
+
 	//Route::resource('oficioCedula','OficioCedulaController');
 	Route::resource('informante','InformanteController');
 
 	Route::get('extraviado/create/{idCedula}', 'ExtraviadoController@create')
 		->name('extraviado.create_desaparecido');
-	Route::post('extraviado/cargarfoto', 'ExtraviadoController@cargarFoto')->name('extraviado.cargar_foto');		
+	Route::post('extraviado/cargarfoto', 'ExtraviadoController@cargarFoto')->name('extraviado.cargar_foto');
 	Route::resource('extraviado','ExtraviadoController');
 
 	Route::resource('familiar','FamiliarController');
@@ -41,11 +45,11 @@ Route::get('/', 'InicioController@index');
 	Route::resource('oficiosDependencias','OficioDependencia');
 
 	//Ruta para la vista de relacionar oficios con dependencias AlfredoR
-	Route::resource('configuraciones','ConfigDocumentosController');	
+	Route::resource('configuraciones','ConfigDocumentosController');
 	Route::resource('dependencia','DependenciaController');
 	Route::resource('encargado','EncargadoController');
 	Route::resource('GeneraOficio','GeneraOficioController');
-    
+
     //comento tacho, si truena algo,descomentar xD
     //Route::resource('dependencia_destinatario','AgregarDependenciaController');
 
@@ -122,7 +126,7 @@ Route::get('consultas/json_partes_cuerpo/{idParteCuerpo}', 'ConsultasController@
 Route::get('consultas/json_subparte_cuerpo/{idParteCuerpo}', 'ConsultasController@json_subparte_cuerpo')->name('consultas.jsonSubpartes');
 
 Route::get('consultas/get_diente/{id}', 'ConsultasController@json_diente')
-	->name('consultas.get_diente');	
+	->name('consultas.get_diente');
 Route::get('consultas/json_cabecera_partes/{idParteCuerpo}', 'ConsultasController@json_cabecera_partes')->name('consultas.jsonCabecerasPartes');
 
 //Se consulta la tabla de la relación de oficios con dependencias AlfredoR
@@ -173,7 +177,7 @@ Route::get('/desaparecido/vestimenta/{idCedula}', 'DesaparecidoController@show_v
 Route::get('consultas/get_accesorios/{idCedula}', 'ConsultasController@jsonAccesorios')
 	->name('consultas.get_accesorios');
 Route::get('consultas/get_calzado/{idCedula}', 'ConsultasController@jsonCalzado')
-	->name('consultas.get_calzado');	
+	->name('consultas.get_calzado');
 
 Route::post('/desaparecido/store_vestimenta', 'DesaparecidoController@store_vestimenta')
 	->name('desaparecido.store_vestimenta');
@@ -194,7 +198,7 @@ Route::post('/desaparecido/update_vestimenta', 'DesaparecidoController@update_ve
 	->name('desaparecido.update_vestimenta');
 
 //Rutas para descripcion fisica
-			
+
 
 //Route::get('descripcionfisica/json_subparte_cuerpo/{idParteCuerpo}', 'DescripcionFisicaController@json_subparte_cuerpo')->name('descripcionfisica.jsonSubpartes');
 
@@ -205,7 +209,7 @@ Route::get('/antecedentesmedicos/antecedentesm/{idPersonaDesaparecida}', 'Antece
 Route::post('/antecedentesmedicos/store', 'AntecedentesMedicosController@store');
 Route::resource('/antecedentesmedicos','AntecedentesMedicosController');
 
-//mostrar vista de señas particulares 
+//mostrar vista de señas particulares
 
 Route::get('consultas/get_senas/{idCedula}', 'ConsultasController@jsonSenas')
 	->name('consultas.get_senas');
@@ -295,14 +299,14 @@ Route::post('/desaparecido/store_desaparecido', 'DesaparecidoController@store_de
 	->name('desaparecido.store_desaparecido');
 
 // Mostrar formulario de la persona desaparecida.
-Route::get('/desaparecido/persona_desaparecida/{idCedula}', 'DesaparecidoController@show_desaparecido');	
+Route::get('/desaparecido/persona_desaparecida/{idCedula}', 'DesaparecidoController@show_desaparecido');
 
 // Guardar informante
 Route::post('/desaparecido/store_informante', 'DesaparecidoController@store_informante')
 	->name('desaparecido.store_informante');
-// Mostrar formulario del informante	
+// Mostrar formulario del informante
 Route::get('/desaparecido/informante/{idCedula}', 'DesaparecidoController@show_informante');
-//mostrar vista de señas particulares 
+//mostrar vista de señas particulares
 Route::get('/desaparecido/senas_particulares/{idCedula}','DesaparecidoController@show_senas_particulares');
 Route::post('/desaparecido/store_senas', 'DesaparecidoController@store_senas')
 	->name('desaparecido.store_senas');
@@ -343,7 +347,7 @@ Route::get('/envioDocumentos','MailController@envioDocumentos');
 Route::get('anexos','AnexosController@show');
 //Route::post('/desaparicion','DesaparicionController@store');
 //Route::get('desaparicion/create/{$id}', 'DesaparicionController@create')
-	//->name ('desaparicion.create_desaparicion');	
+	//->name ('desaparicion.create_desaparicion');
 Route::resource('/desaparicion','DesaparicionController');
 
 //Route::resource('desaparicion' , 'DesaparicionController@store');
@@ -357,7 +361,7 @@ Route::post('anexosC/imagenDesaparecido','AnexosController@store');
 
 
 
-Route::get('conexion/uipj/{carpeta}', 'ConexionUipjController@resolviendo_peticion');
+// Route::POST('conexion/uipj', 'ConexionUipjController@resolviendo_peticion');
 
 /*OFICIOS*/
 Route::post('oficios', 'OficioController@oficios')->name('oficios');
@@ -378,3 +382,4 @@ Route::get('/pruebasformatos', function(){
 Route::get('jsonOficio1/{id}', 'OficioCedulaController@json_oficio1')->name('jsonOficio1');
 Route::get('json_oficio2/{id}', 'OficioCedulaController@json_oficio2')->name('json_oficio2');
 Route::resource('oficioCedula','OficioCedulaController');
+});

@@ -52,8 +52,8 @@ class CedulaController extends Controller
 
 		$dialectos = \App\Models\CatDialecto::all()->pluck('nombre','id');
 
-		return view('cedula.create',compact('cedula',											
-											'dialectos'                     
+		return view('cedula.create',compact('cedula',
+											'dialectos'
 									));
 	}
 
@@ -64,7 +64,7 @@ class CedulaController extends Controller
 	 * @return \Illuminate\Http\Response
 	 */
 	public function store(Request $request)
-	{		
+	{
 		//dd($request->toArray());
 		$cedula = Cedula::create([
 			'entrevistadorNombres' 			=> Session::get('fiscalNombres'),
@@ -92,15 +92,17 @@ class CedulaController extends Controller
 	 * @param  int  $id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function show($id)
+	public function show(Request $request,$id)
 	{
-		$cedula = Cedula::find($id);		
+		// dd($request->token);
+		$cedula = Cedula::find($id);
 		$dialectos = \App\Models\CatDialecto::all()->pluck('nombre','id');
-
+		$token=$request->token;
 		//dd($cedula->toArray());
 
-		return view('cedula.show',compact('cedula',											
-											'dialectos'                     
+		return view('cedula.show',compact('cedula',
+											'dialectos',
+											'token'
 									));
 
 
@@ -121,7 +123,7 @@ class CedulaController extends Controller
 		return view('cedula.edit',compact('cedula',
 										'dialectos'
 									));
-		
+
 	}
 
 	/**

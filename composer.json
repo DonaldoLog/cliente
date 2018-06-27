@@ -14,7 +14,9 @@
         "laravel/framework": "5.6.*",
         "laravel/tinker": "^1.0",
         "laravelcollective/html": "^5.4.0",
-        "phpoffice/phpword": "^0.14.0"
+        "phpoffice/phpword": "^0.14.0",
+        "tymon/jwt-auth": "0.5.*"
+
     },
     "require-dev": {
         "filp/whoops": "^2.0",

@@ -18,3 +18,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('personas_no_localizadas/{idCarpeta}', 'ConexionUipjController@getDesaparecidosCarpeta')->name('personas_no_localizadas');
+Route::post('login','AuthenticateController@authenticate')->name('login');
+
+Route::middleware(['jwt.auth'])->group(function(){
+    Route::post('conexion/uipj', 'ConexionUipjController@resolviendo_peticion');
+    Route::get('cedula/{idCedula}', 'CedulaController@show');
+
+});

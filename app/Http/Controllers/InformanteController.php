@@ -52,7 +52,7 @@ class InformanteController extends Controller
 								'ext' => $ext[$index]
 						);
 		}
-		
+
 		$persona = Persona::create([
 			'nombres'           => $request->input('nombres'),
 			'primerAp'          => $request->input('primerAp'),
@@ -64,7 +64,7 @@ class InformanteController extends Controller
 			'idPersona'             => $persona->id,
 			'idCedula'              => $request->input('idCedula'),
 			'idParentesco'          => $request->input('idParentesco'),
-			'idDocumentoIdentidad'  => $request->input('idDocumentoIdentidad'), 
+			'idDocumentoIdentidad'  => $request->input('idDocumentoIdentidad'),
 			'otroDocIdentidad'      => $request->input('otroDocIdentidad'),
 			'numDocIdentidad'       => $request->input('numDocIdentidad'),
 			'correoElectronico'     => $request->input('correoElectronico'),
@@ -73,7 +73,7 @@ class InformanteController extends Controller
 			'notificaciones'        => $autorizado,
 			'tipoPersona'           => 'INFORMANTE',
 		]);
-		
+
 		$domicilio = Domicilio::create([
 			'idDesaparecido'    => $desaparecido->id,
 			'tipoDireccion'     => $request->input('tipoDireccion'),
@@ -93,7 +93,7 @@ class InformanteController extends Controller
 						'segundoAp' => $desaparecido->persona->segundoAp,
 						'informante' => $desaparecido->informante,
 						'notificaciones' => $desaparecido->notificaciones, );
-		
+
 		return response()->json($data);
 	}
 
@@ -103,9 +103,8 @@ class InformanteController extends Controller
 	 * @param  int  $id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function show($id)
+	public function show(Request $request,$id)
 	{
-
 		$cedula = \App\Models\Cedula::find($id);
 
 		$sexos = array('H' => 'MASCULINO', 'M' => 'FEMENINO');
@@ -113,7 +112,7 @@ class InformanteController extends Controller
 		$ocupaciones        = \App\Models\CatOcupacion::all()->pluck('nombre','id');
 		$identificaciones   = \App\Models\CatDocumento::all()->pluck('nombre','id');
 		$edoscivil          = \App\Models\CatEstadoCivil::all()->pluck('nombre','id');
-		
+
 		$parentescos = \App\Models\CatParentesco::all()->pluck('nombre','id');
 		$nacionalidades     = \App\Models\CatNacionalidad::all()->pluck('nombre', 'id');
 		$ladas = \App\Models\CatNacionalidad::all()->pluck('lada','id');
@@ -130,7 +129,7 @@ class InformanteController extends Controller
 
 		$tiposTelefonos = array('CASA' => 'CASA',
 								'TRABAJO' => 'TRABAJO',
-								'CELULAR' => 'CELULAR');            
+								'CELULAR' => 'CELULAR');
 
 		$informantes = \DB::table('desaparecidos_personas AS dp')
             ->where('dp.tipoPersona', 'INFORMANTE')
@@ -138,7 +137,9 @@ class InformanteController extends Controller
             ->where('dp.idCedula', $cedula->id)
             ->get();
          //dd($informantes);
-		return view('informante.index',compact(                                           
+		 $token=$request->token;
+
+		return view('informante.index',compact(
 											'cedula',
 											'sexos',
 											'escolaridades',
@@ -157,10 +158,11 @@ class InformanteController extends Controller
 											'informantes',
 											'codigos',
 											'tiposDireccion',
-											'tiposTelefonos'
-										)); 
-		
-		
+											'tiposTelefonos',
+											'token'
+										));
+
+
 	}
 
 	/**
@@ -182,17 +184,17 @@ class InformanteController extends Controller
 	 * @return \Illuminate\Http\Response
 	 */
 	public function update(InformanteRequest $request, $id)
-	{       
-		
+	{
+
 	   $desaparecido = Desaparecido::find($id);
 	   $domicilios = Domicilio::find($desaparecido->domicilios[0]['id']);
-	   
+
 	   $noDomicilio = $desaparecido->domicilios[0]['id'];
-	   
+
 
 		$informante = (is_null($request->input('informante'))) ? 0 : 1 ;
 		$autorizado = (is_null($request->input('notificaciones'))) ? 0 : 1 ;
-        
+
         $tipo_telefono = $request->input('tipoTelefono');
 		$lada = $request->input('lada');
 		$ext = $request->input('ext');
@@ -239,15 +241,15 @@ class InformanteController extends Controller
 									 'telefono' => $request->input('telefono'),
 									 'ext' => $request->input('ext'))),
 		]);
-		
+
 		if ($desaparecido) {
-					$desaparecido = Desaparecido::find($id);                    
+					$desaparecido = Desaparecido::find($id);
 					$data = array('nombres' => $desaparecido->persona->nombres,
 						'primerAp' => $desaparecido->persona->primerAp,
 						'segundoAp' => $desaparecido->persona->segundoAp,
 						'informante' => $desaparecido->informante,
 						'notificaciones' => $desaparecido->notificaciones );
-			
+
 		}
 
 		return response()->json($data);
